@@ -4,10 +4,14 @@ on:
   push:
     branches: [ main ]
     paths:
-      - 'frontend/**'
-      - '.github/workflows/ci.yml'
+      - '**.js'
+      - '**.ts'
+      - '**.tsx'
+      - 'package*.json'
+      - 'vite.config.*'
       - 'Dockerfile'
       - 'nginx.conf'
+      - '.github/workflows/ci.yml'
   pull_request:
     branches: [ main ]
 
@@ -26,22 +30,19 @@ jobs:
           node-version: '22'
 
       - name: Install dependencies
-        working-directory: ./frontend
         run: npm ci
 
       - name: Run tests
-        working-directory: ./frontend
         run: npm test --if-present
 
       - name: Build app
-        working-directory: ./frontend
         run: npm run build
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: vite-build
-          path: frontend/dist
+          path: dist
 
   docker-build-and-deploy:
     name: Docker Build & Push
