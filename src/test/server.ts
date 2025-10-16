@@ -1,15 +1,23 @@
 import { setupServer } from 'msw/node'
 import { http, HttpResponse } from 'msw'
 
+interface LoginRequestBody {
+  username?: string;
+  password?: string;
+}
+
 export const handlers = [
   // Mock login
-  http.post('http://localhost:9080/api/v1/auth/login', async ({ request }) => {
-    const body = await request.json()
-    if (body?.username === 'test' && body?.password === 'pass') {
-      return HttpResponse.json({ token: 'mock-token' })
+  http.post<never, LoginRequestBody>(
+    'http://localhost:9080/api/v1/auth/login',
+    async ({ request }) => {
+      const body = await request.json()
+      if (body?.username === 'test' && body?.password === 'pass') {
+        return HttpResponse.json({ token: 'mock-token' })
+      }
+      return new HttpResponse(null, { status: 401 })
     }
-    return new HttpResponse(null, { status: 401 })
-  }),
+  ),
 
   // Mock register
   http.post('http://localhost:9080/api/v1/auth/register', () =>
