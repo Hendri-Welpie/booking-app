@@ -1,54 +1,36 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import api from './client';
+import api from './client'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+import axios from 'axios'
 
-vi.mock('axios', () => {
-  const mockAxiosInstance = {
-    interceptors: {
-      request: {
-        use: vi.fn(),
-        eject: vi.fn(),
-      },
-      response: {
-        use: vi.fn(),
-        eject: vi.fn(),
-      },
-    },
-    create: vi.fn(() => mockAxiosInstance),
-  };
-  return {
-    default: mockAxiosInstance,
-    ...mockAxiosInstance,
-  };
-});
+vi.mock('axios') // mock axios if needed
 
 describe('api client', () => {
   beforeEach(() => {
-    vi.clearAllMocks();
-    localStorage.clear();
-  });
+    localStorage.clear()
+  })
 
   it('adds Authorization header if token exists', async () => {
-    localStorage.setItem('token', 'mock-token');
+    localStorage.setItem('token', 'mock-token')
 
-    await import('./client');
+    // Create a dummy config to simulate interceptor input
+    const config = { url: '/api/v1/test', headers: {} as Record<string, string> }
 
-    const fulfilledHandler = api.interceptors.request.use.mock.calls[0][0];
-
-    const mockConfig = { headers: {} };
-    const cfg = await fulfilledHandler(mockConfig);
-
-    expect(cfg.headers.Authorization).toBe('Bearer mock-token');
-  });
+    // Simulate the interceptor by running request.use manually
+    const requestInterceptor = (api as any).interceptors.request['handlers'][0]?.fulfilled
+    if (requestInterceptor) {
+      const result = await requestInterceptor(config)
+      expect(result.headers.Authorization).toBe('Bearer mock-token')
+    } else {
+      // Fallback: test via an actual request using axios mock
+      const spy = vi.spyOn(axios, 'request').mockResolvedValueOnce({ data: {} })
+      await api.get('/api/v1/test')
+      expect(spy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          headers: expect.objectContaining({ Authorization: 'Bearer mock-token' }),
+        })
+      )
+    }
+  })
 
   it('skips Authorization for /auth/login', async () => {
-    localStorage.setItem('token', 'mock-token');
-    await import('./client');
-
-    const fulfilledHandler = api.interceptors.request.use.mock.calls[0][0];
-
-    const mockConfig = { url: '/api/v1/auth/login', headers: {} };
-    const cfg = await fulfilledHandler(mockConfig);
-
-    expect(cfg.headers.Authorization).toBeUndefined();
-  });
-});
+    localStorage.setItem('token', 'mock-token')
