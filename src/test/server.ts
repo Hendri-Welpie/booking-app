@@ -7,7 +7,6 @@ interface LoginRequestBody {
 }
 
 export const handlers = [
-  // Mock login
   http.post<never, LoginRequestBody>(
     'http://localhost:9080/api/v1/auth/login',
     async ({ request }) => {
@@ -19,12 +18,10 @@ export const handlers = [
     }
   ),
 
-  // Mock register
   http.post('http://localhost:9080/api/v1/auth/register', () =>
     HttpResponse.json({ message: 'Registered successfully' })
   ),
 
-  // Mock available rooms
   http.get('http://localhost:9080/api/v1/reservations/available-rooms', () =>
     HttpResponse.json([
       { id: 1, roomNumber: 101, roomType: 'Deluxe' },
@@ -32,7 +29,6 @@ export const handlers = [
     ])
   ),
 
-  // Mock user
   http.get('http://localhost:9080/api/v1/user', () =>
     HttpResponse.json({ id: 'user-123', username: 'test' })
   ),

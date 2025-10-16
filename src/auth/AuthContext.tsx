@@ -12,7 +12,6 @@ export const AuthProvider = ({ children }: any) => {
     const token = res?.data?.token
     if(token){
       localStorage.setItem('token', token)
-      // simple user representation
       setUser({ username })
       return { success: true }
     }

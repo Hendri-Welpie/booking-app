@@ -14,7 +14,6 @@ export default function MyReservationsPage() {
   const { enqueueSnackbar } = useSnackbar()
   const [userId, setUserId] = useState<string | null>(localStorage.getItem('userId'))
 
-  // Edit modal state
   const [editOpen, setEditOpen] = useState(false)
   const [editItem, setEditItem] = useState<any | null>(null)
   const [editForm, setEditForm] = useState({
@@ -33,7 +32,7 @@ export default function MyReservationsPage() {
 
   const fetchUserIfNeeded = useCallback(async () => {
     try {
-      let storedId = localStorage.getItem('userId')
+      let storedId:any = localStorage.getItem('userId')
       if (!storedId) {
         const res = await api.get('/api/v1/user', { headers: { 'X-Trace-Id': 'browser-client' } })
         if (res?.data?.id) {

@@ -54,8 +54,6 @@ export default function BookingModal({ open, onClose, room, checkin, checkout, o
   const [loadingUser, setLoadingUser] = React.useState(false)
   const [userId, setUserId] = React.useState<string | null>(null)
   const fieldNames = ['firstname', 'surname', 'checkinDate', 'checkoutDate'] as const;
-  type FieldName = (typeof fieldNames)[number]; // Infers type 'firstname' | 'surname' | ...
-
 
   React.useEffect(() => {
     const fetchUserInfo = async () => {

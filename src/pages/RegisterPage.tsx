@@ -31,6 +31,15 @@ export default function RegisterPage() {
 
   const nav = useNavigate()
   const { enqueueSnackbar } = useSnackbar()
+  const fieldNames = ['username', 'email', 'firstName', 'lastName', 'password'] as const;
+  const fieldLabels: Record<(typeof fieldNames)[number], string> = {
+    firstName: 'First Name',
+    lastName: 'Last Name',
+    password: 'Password',
+    username: 'Username',
+    email: 'Email'
+  };
+
 
   const onSubmit = async (data: any) => {
     try {
@@ -83,24 +92,17 @@ export default function RegisterPage() {
             </Typography>
 
             <form onSubmit={handleSubmit(onSubmit)} style={{ display: 'grid', gap: 16 }}>
-              {['username', 'email', 'firstName', 'lastName', 'password'].map((name) => (
+              {fieldNames.map((fieldName) => (
                 <Controller
-                  key={name}
-                  name={name as keyof any}
+                  key={fieldName}
+                  name={fieldName}
                   control={control}
                   render={({ field }) => (
                     <TextField
                       {...field}
-                      label={
-                        name === 'firstName'
-                          ? 'First Name'
-                          : name === 'lastName'
-                          ? 'Last Name'
-                          : name === 'password'
-                          ? 'Password'
-                          : name.charAt(0).toUpperCase() + name.slice(1)
+                      label={fieldLabels[fieldName]
                       }
-                      type={name === 'password' ? 'password' : 'text'}
+                      type={fieldName === 'password' ? 'password' : 'text'}
                       fullWidth
                       variant="outlined"
                       InputProps={{
