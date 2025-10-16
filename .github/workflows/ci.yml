@@ -80,4 +80,4 @@ jobs:
           push: true
           tags: |
             docker.io/${{ secrets.DOCKER_USERNAME }}/booking-ui:latest
-            ghcr.io/${{ github.repository_owner }}/booking-ui:latest
+            ghcr.io/hendri-welpie/booking-ui:latest
