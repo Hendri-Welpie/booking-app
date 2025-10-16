@@ -1,45 +1,51 @@
-import api from './client'
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import axios from 'axios'
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-vi.mock('axios') // mock axios if needed
+// Mock the axios module to have a functional interceptor chain
+const mockAxiosInstance = {
+  get: vi.fn(),
+  post: vi.fn(),
+  interceptors: {
+    request: {
+      use: vi.fn(),
+      eject: vi.fn(),
+    },
+  },
+};
+
+vi.mock('axios', () => ({
+  default: {
+    create: vi.fn(() => mockAxiosInstance),
+  },
+}));
 
 describe('api client', () => {
   beforeEach(() => {
-    localStorage.clear()
-  })
-
+    localStorage.clear();
+    vi.clearAllMocks();
+  });
+  
   it('adds Authorization header if token exists', async () => {
-    localStorage.setItem('token', 'mock-token')
+    localStorage.setItem('token', 'mock-token');
+    
+    // Simulate the interceptor being registered
+    const requestInterceptorFn = mockAxiosInstance.interceptors.request.use.mock.calls[0][0];
 
     // Create a dummy config to simulate interceptor input
-    const config = { url: '/api/v1/test', headers: {} as Record<string, string> }
+    const config = { url: '/api/v1/test', headers: {} };
+    
+    const result = requestInterceptorFn(config);
 
-    // Simulate the interceptor by running request.use manually
-    const requestInterceptor = (api as any).interceptors.request['handlers'][0]?.fulfilled
-    if (requestInterceptor) {
-      const result = await requestInterceptor(config)
-      expect(result.headers.Authorization).toBe('Bearer mock-token')
-    } else {
-      // Fallback: test via an actual request using axios mock
-      const spy = vi.spyOn(axios, 'request').mockResolvedValueOnce({ data: {} })
-      await api.get('/api/v1/test')
-      expect(spy).toHaveBeenCalledWith(
-        expect.objectContaining({
-          headers: expect.objectContaining({ Authorization: 'Bearer mock-token' }),
-        })
-      )
-    }
-  })
+    expect(result.headers.Authorization).toBe('Bearer mock-token');
+  });
 
   it('skips Authorization for /auth/login', async () => {
-    localStorage.setItem('token', 'mock-token')
-    const spy = vi.spyOn(axios, 'request').mockResolvedValueOnce({ data: {} })
-    await api.post('/api/v1/auth/login')
-    expect(spy).toHaveBeenCalledWith(
-      expect.not.objectContaining({
-        headers: expect.objectContaining({ Authorization: 'Bearer mock-token' }),
-      })
-    )
-  })
-})
+    localStorage.setItem('token', 'mock-token');
+    
+    const requestInterceptorFn = mockAxiosInstance.interceptors.request.use.mock.calls[0][0];
+    const config = { url: '/api/v1/auth/login', headers: {} };
+    
+    const result = requestInterceptorFn(config);
+
+    expect(result.headers.Authorization).toBeUndefined();
+  });
+});
