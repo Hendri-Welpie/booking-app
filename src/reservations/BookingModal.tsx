@@ -53,6 +53,9 @@ export default function BookingModal({ open, onClose, room, checkin, checkout, o
 
   const [loadingUser, setLoadingUser] = React.useState(false)
   const [userId, setUserId] = React.useState<string | null>(null)
+  const fieldNames = ['firstname', 'surname', 'checkinDate', 'checkoutDate'] as const;
+  type FieldName = (typeof fieldNames)[number]; // Infers type 'firstname' | 'surname' | ...
+
 
   React.useEffect(() => {
     const fetchUserInfo = async () => {
@@ -140,25 +143,25 @@ export default function BookingModal({ open, onClose, room, checkin, checkout, o
               </Box>
             ) : (
               <form onSubmit={handleSubmit(onSubmit)} style={{ display: 'grid', gap: 16 }}>
-                {['firstname', 'surname', 'checkinDate', 'checkoutDate'].map((name) => (
+                {fieldNames.map((fieldName) => (
                   <Controller
-                    key={name}
-                    name={name as keyof any}
+                    key={fieldName}
+                    name={fieldName}
                     control={control}
                     render={({ field }) => (
                       <TextField
                         {...field}
                         label={
-                          name === 'checkinDate'
+                          fieldName === 'checkinDate'
                             ? 'Check-in'
-                            : name === 'checkoutDate'
+                            : fieldName === 'checkoutDate'
                             ? 'Check-out'
-                            : name === 'firstname'
+                            : fieldName === 'firstname'
                             ? 'First Name'
                             : 'Surname'
                         }
                         type={
-                          name === 'checkinDate' || name === 'checkoutDate'
+                          fieldName === 'checkinDate' || fieldName === 'checkoutDate'
                             ? 'date'
                             : 'text'
                         }
@@ -166,8 +169,8 @@ export default function BookingModal({ open, onClose, room, checkin, checkout, o
                           shrink: true,
                           style: { color: '#94a3b8' },
                         }}
-                        error={!!errors[name as keyof typeof errors]}
-                        helperText={errors[name as keyof typeof errors]?.message as string}
+                        error={!!errors[fieldName as keyof typeof errors]}
+                        helperText={errors[fieldName as keyof typeof errors]?.message as string}
                         fullWidth
                         variant="outlined"
                         InputProps={{
