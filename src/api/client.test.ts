@@ -1,5 +1,5 @@
 import api from './client'
-import { vi, describe, it, expect } from 'vitest'
+import { describe, it, expect } from 'vitest'
 
 describe('api client', () => {
   it('adds Authorization header if token exists', async () => {

@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from 'react'
+import { createContext, useContext, useState } from 'react'
 import api from '../api/client' 
 
 type User = { username: string, email?: string } | null
